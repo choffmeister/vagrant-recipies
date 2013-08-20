@@ -60,6 +60,17 @@ mv composer.phar /usr/local/bin/composer
 ## Exit
 ## ========================
 
+# set password of vagrant user to vagrant
+echo -e "vagrant\nvagrant\n" | passwd vagrant
+
+# export proxy variables to vagrant user (if proxy is set)
+if [[ $PROXY_HTTP ]]; then
+	echo "export http_proxy=$PROXY_HTTP" > /home/vagrant/.bashrc
+fi
+if [[ $PROXY_HTTPS ]]; then
+	echo "export https_proxy=$PROXY_HTTPS" > /home/vagrant/.bashrc
+fi
+
 # display MySQL root credentials
 echo "============================================="
 echo "MySQL root username: root"
