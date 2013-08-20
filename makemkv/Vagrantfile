@@ -1,4 +1,6 @@
 Vagrant.configure("2") do |config|
+  # for unix use "/dev/sr0" or something like that
+  # for windows use "D:" or something like that
   optical_drive = "/dev/sr0"
 
   config.vm.box = "precise64"
