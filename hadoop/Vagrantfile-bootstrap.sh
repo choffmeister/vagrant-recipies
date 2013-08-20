@@ -115,10 +115,10 @@ echo -e "vagrant\nvagrant\n" | passwd vagrant
 
 # export proxy variables to vagrant user (if proxy is set)
 if [[ $PROXY_HTTP ]]; then
-	echo "export http_proxy=$PROXY_HTTP" > /home/vagrant/.bashrc
+	echo "export http_proxy=$PROXY_HTTP" >> /home/vagrant/.bashrc
 fi
 if [[ $PROXY_HTTPS ]]; then
-	echo "export https_proxy=$PROXY_HTTPS" > /home/vagrant/.bashrc
+	echo "export https_proxy=$PROXY_HTTPS" >> /home/vagrant/.bashrc
 fi
 
 # display Hadoop user credentials
