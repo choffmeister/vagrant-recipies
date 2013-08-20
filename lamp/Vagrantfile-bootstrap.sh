@@ -49,6 +49,9 @@ echo debconf mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD | de
 # install Apache, MySQL and PHP5
 aptitude install -y apache2 php5 php5-mysql mysql-server
 
+# install common used extensions
+aptitude install -y php5-intl php-apc
+
 ## ========================
 ## Install composer
 ## ========================
