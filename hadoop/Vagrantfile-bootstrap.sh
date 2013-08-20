@@ -4,23 +4,13 @@
 ## Settings
 ## ========================
 
+# Webproxy (just comment out the two following lines, if no proxy should be used)
+#PROXY_HTTP=""
+#PROXY_HTTPS=""
+
 # Hadoop user and group
 HADOOP_GROUP="hadoop"
 HADOOP_USER="hadoop"
-
-# Webproxy (just comment out the two following lines, if no proxy should be used)
-PROXY_HTTP=""
-PROXY_HTTPS=""
-
-## ========================
-## Permission
-## ========================
-
-# assert that this script is run with root rights
-if [[ $EUID -ne 0 ]]; then
-	echo "This script must be run as root" 1>&2
-	exit 1
-fi
 
 ## ========================
 ## Configure proxy
@@ -37,14 +27,17 @@ if [[ $PROXY_HTTPS ]]; then
 fi
 
 ## ========================
-## Base configuration
+## Install basics
 ## ========================
 
 # update packages
 aptitude update
 
-# install vim
+# install packages
 aptitude install -y vim
+aptitude install -y curl
+aptitude install -y git
+aptitude install -y python-software-properties
 
 ## ========================
 ## Hadoop installation
@@ -113,14 +106,14 @@ echo -e "<configuration>\n<property>\n<name>mapred.job.tracker</name>\n<value>lo
 # start Hadoop
 sudo -u $HADOOP_USER start-all.sh
 
+## ========================
+## Exit
+## ========================
+
 # display Hadoop user credentials
 echo "============================================="
-echo "Installation finished"
-echo "Username: $HADOOP_USER"
-echo "Password: $HADOOP_USER"
-echo ""
-echo "PLEASE CHANGE THE PASSWORD OF THE USER!"
+echo "Hadoop user username: $HADOOP_USER"
+echo "Hadoop user password: $HADOOP_USER"
 echo "============================================="
 
-# exit
 exit 0

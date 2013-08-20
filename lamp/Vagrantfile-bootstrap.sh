@@ -5,18 +5,11 @@
 ## ========================
 
 # Webproxy (just comment out the two following lines, if no proxy should be used)
-PROXY_HTTP=""
-PROXY_HTTPS=""
+#PROXY_HTTP=""
+#PROXY_HTTPS=""
 
-## ========================
-## Permission
-## ========================
-
-# assert that this script is run with root rights
-if [[ $EUID -ne 0 ]]; then
-	echo "This script must be run as root" 1>&2
-	exit 1
-fi
+# MySQL root password
+MYSQL_ROOT_PASSWORD="root"
 
 ## ========================
 ## Configure proxy
@@ -36,19 +29,41 @@ fi
 ## Install basics
 ## ========================
 
+# update packages
 aptitude update
-aptitude install -y vim python-software-properties git
+
+# install packages
+aptitude install -y vim
+aptitude install -y curl
+aptitude install -y git
+aptitude install -y python-software-properties
 
 ## ========================
 ## Install LAMP server
 ## ========================
 
 # set MySQL root password to root
-echo debconf mysql-server/root_password password root | debconf-set-selections
-echo debconf mysql-server/root_password_again password root | debconf-set-selections
+echo debconf mysql-server/root_password password $MYSQL_ROOT_PASSWORD | debconf-set-selections
+echo debconf mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD | debconf-set-selections
 
 # install Apache, MySQL and PHP5
 aptitude install -y apache2 php5 php5-mysql mysql-server
 
-# exit
+## ========================
+## Install composer
+## ========================
+
+curl -sS https://getcomposer.org/installer | php
+mv composer.phar /usr/local/bin/composer
+
+## ========================
+## Exit
+## ========================
+
+# display MySQL root credentials
+echo "============================================="
+echo "MySQL root username: root"
+echo "MySQL root password: $MYSQL_ROOT_PASSWORD"
+echo "============================================="
+
 exit 0
