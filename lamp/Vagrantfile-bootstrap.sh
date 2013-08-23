@@ -54,7 +54,7 @@ sed -i /etc/mysql/my.cnf -e 's/127\.0\.0\.1/0\.0\.0\.0/g'
 service mysql restart
 
 # install common used extensions
-aptitude install -y php5-intl php-apc
+aptitude install -y php5-intl php-apc php5-xdebug
 
 ## ========================
 ## Install some PEAR tools
