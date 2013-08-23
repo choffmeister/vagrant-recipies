@@ -57,6 +57,28 @@ service mysql restart
 aptitude install -y php5-intl php-apc
 
 ## ========================
+## Install some PEAR tools
+## ========================
+
+# install PEAR
+aptitude install -y php-pear
+
+# configure proxy for PEAR
+if [[ $PROXY_HTTP ]]; then
+	pear config-set http_proxy $PROXY_HTTP
+fi
+
+# install PHPUnit and PHP_CodeCoverage
+pear config-set auto_discover 1
+pear channel-discover pear.phpunit.de
+pear channel-discover components.ez.no
+pear install --alldeps pear.phpunit.de/PHPUnit
+pear install --alldeps phpunit/PHP_CodeCoverage
+
+# install PHP_CodeSniffer
+pear install --alldeps PHP_CodeSniffer
+
+## ========================
 ## Install composer
 ## ========================
 
