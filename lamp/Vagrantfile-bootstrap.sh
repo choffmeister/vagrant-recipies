@@ -48,6 +48,8 @@ echo debconf mysql-server/root_password_again password $MYSQL_ROOT_PASSWORD | de
 
 # install Apache, MySQL and PHP5
 aptitude install -y apache2 php5 php5-mysql mysql-server
+a2enmod rewrite
+service apache2 restart
 
 # make MySQL listen on all devices
 sed -i /etc/mysql/my.cnf -e 's/127\.0\.0\.1/0\.0\.0\.0/g'
