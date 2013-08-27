@@ -12,6 +12,14 @@
 # MySQL root password
 MYSQL_ROOT_PASSWORD="root"
 
+GITLAB_HOST="localhost"
+GITLAB_PORT="8080"
+GITLAB_HTTP="http://localhost:8080/"
+GITLAB_HTTP_ESCAPED="http:\/\/localhost:8080\/"
+GITLABCI_HOST="localhost"
+GITLABCI_PORT="9292"
+GITLABCI_HTTP="http://localhost:9292/"
+
 ## ========================
 ## Configure proxy
 ## ========================
@@ -26,7 +34,7 @@ if [[ $PROXY_HTTPS ]]; then
 	export https_proxy=$PROXY_HTTPS
 fi
 if [[ $PROXY_FTP ]]; then
-	export ftp_proxy=$PROXY_HTTP
+	export ftp_proxy=$PROXY_FTP
 fi
 
 ## ========================
@@ -79,7 +87,7 @@ gem install bundler --no-ri --no-rdoc
 ## ========================
 
 # set Postfix configuration
-echo debconf postfix/mailname string 'gitlab.invalid-domain.tld' | debconf-set-selections
+echo debconf postfix/mailname string '$GITLAB_HOST' | debconf-set-selections
 echo debconf postfix/main_mailer_type string 'Internet Site' | debconf-set-selections
 
 # install Postfix
@@ -104,7 +112,7 @@ git clone https://github.com/gitlabhq/gitlab-shell.git
 cd gitlab-shell
 git checkout v1.7.0
 cp config.yml.example config.yml
-sed -i config.yml -e "s/gitlab_url: \"http:\/\/localhost\/\"/gitlab_url: \"http:\/\/localhost:8080\/\"/g"
+sed -i config.yml -e "s/gitlab_url: \"http:\/\/localhost\/\"/gitlab_url: \"$GITLAB_HTTP_ESCAPED\"/g"
 chown -R git:git ./
 sudo -u git -H ./bin/install
 
@@ -114,7 +122,7 @@ git clone https://github.com/gitlabhq/gitlabhq.git gitlab
 cd gitlab
 git checkout 6-0-stable
 cp config/gitlab.yml.example config/gitlab.yml
-sed -i config/gitlab.yml -e "s/    port: 80/    port: 8080/g"
+sed -i config/gitlab.yml -e "s/    port: 80/    port: $GITLAB_PORT/g"
 
 # Make sure GitLab can write to the needed directories
 mkdir /home/git/gitlab-satellites
@@ -134,7 +142,7 @@ cp config/unicorn.rb.example config/unicorn.rb
 
 # configure git
 sudo -u git -H git config --global user.name "GitLab"
-sudo -u git -H git config --global user.email "gitlab@localhost"
+sudo -u git -H git config --global user.email "gitlab@$GITLAB_HOST"
 sudo -u git -H git config --global core.autocrlf input
 
 # configure database
@@ -183,12 +191,12 @@ git checkout 3-1-stable
 
 # configure gitlab url into gitlab_ci
 cp config/application.yml.example config/application.yml
-sed -i config/application.yml -e "s/    - 'https:\/\/dev.gitlab.org\/'/    - 'http:\/\/localhost:8080\/'/g"
+sed -i config/application.yml -e "s/    - 'https:\/\/dev.gitlab.org\/'/    - '$GITLAB_HTTP_ESCAPED'/g"
 sed -i config/application.yml -e "s/    - 'https:\/\/staging.gitlab.org\/'//g"
 
 # configure gitlab_ci to listen on port 9292
 cp config/puma.rb.example config/puma.rb
-sed -i config/puma.rb -e "s/# bind 'tcp/bind 'tcp/g"
+sed -i config/puma.rb -e "s/# bind 'tcp.*/bind 'tcp:\/\/0.0.0.0:$GITLABCI_PORT'/g"
 sed -i config/puma.rb -e 's/bind "unix/# bind "unix/g'
 
 mkdir -p tmp/sockets/
@@ -221,22 +229,6 @@ update-rc.d gitlab_ci defaults 21
 service gitlab_ci start
 
 ## ========================
-## Install GitLab CI Runner
-## ========================
-
-aptitude install -y libicu-dev
-
-# create gitlab_ci_runner user
-adduser --disabled-login --gecos 'GitLab-CI-Runner' gitlab_ci_runner
-cd /home/gitlab_ci_runner
-
-git clone https://github.com/gitlabhq/gitlab-ci-runner.git
-cd gitlab-ci-runner
-
-bundle install
-chown -R gitlab_ci_runner:gitlab_ci_runner /home/gitlab_ci_runner
-
-## ========================
 ## Exit
 ## ========================
 
@@ -257,17 +249,6 @@ echo "MySQL root username: root"
 echo "MySQL root password: $MYSQL_ROOT_PASSWORD"
 echo "GitLab admin username: root"
 echo "GitLab admin password: 5iveL!fe"
-echo "============================================="
-
-# display final instructions
-echo "============================================="
-echo "IMPORTANT!"
-echo "SSH into the machine and execute:"
-echo ""
-echo "sudo su gitlab_ci_runner"
-echo "cd /home/gitlab_ci_runner/gitlab-ci-runner"
-echo "bundle exec ./bin/install"
-echo "bundle exec ./bin/runner"
 echo "============================================="
 
 exit 0
