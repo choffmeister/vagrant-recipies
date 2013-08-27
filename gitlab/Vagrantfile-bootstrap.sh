@@ -104,6 +104,7 @@ git clone https://github.com/gitlabhq/gitlab-shell.git
 cd gitlab-shell
 git checkout v1.7.0
 cp config.yml.example config.yml
+sed -i config.yml -e "s/gitlab_url: \"http:\/\/localhost\/\"/gitlab_url: \"http:\/\/localhost:8080\/\"/g"
 chown -R git:git ./
 sudo -u git -H ./bin/install
 
@@ -113,6 +114,7 @@ git clone https://github.com/gitlabhq/gitlabhq.git gitlab
 cd gitlab
 git checkout 6-0-stable
 cp config/gitlab.yml.example config/gitlab.yml
+sed -i config/gitlab.yml -e "s/    port: 80/    port: 8080/g"
 
 # Make sure GitLab can write to the needed directories
 mkdir /home/git/gitlab-satellites
@@ -265,6 +267,7 @@ echo ""
 echo "sudo su gitlab_ci_runner"
 echo "cd /home/gitlab_ci_runner/gitlab-ci-runner"
 echo "bundle exec ./bin/install"
+echo "bundle exec ./bin/runner"
 echo "============================================="
 
 exit 0
